@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/command-request.schema.json",
+  "title": "Command Request",
+  "description": "A normalized request for a Word Counter command.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "command",
+    "sources"
+  ],
+  "properties": {
+    "command": {
+      "type": "string",
+      "enum": [
+        "stats",
+        "top",
+        "freq",
+        "readability",
+        "diff",
+        "compare",
+        "merge",
+        "history"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "input-source.schema.json"
+      },
+      "minItems": 0
+    },
+    "options": {
+      "$ref": "analysis-options.schema.json"
+    },
+    "word": {
+      "type": "string",
+      "description": "Target word for the freq command."
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of rows for top-word results."
+    },
+    "history_last": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of history records requested by the history command."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "const": "freq"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "word"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command": {
+            "const": "diff"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sources": {
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "word-counter-schema",
+  "repository": "PrincetonAfeez/Word-Counter",
+  "description": "Simple starter JSON Schemas for the Word Counter project.",
+  "schema_draft": "https://json-schema.org/draft/2020-12/schema",
+  "created_at": "2026-05-03T20:17:56Z",
+  "files": [
+    {
+      "path": "Schema/input-source.schema.json",
+      "description": "Text input source such as file, stdin, or inline text."
+    },
+    {
+      "path": "Schema/analysis-options.schema.json",
+      "description": "Tokenizer, output format, normalization, and filter options."
+    },
+    {
+      "path": "Schema/text-stats.schema.json",
+      "description": "Core text statistics output object."
+    },
+    {
+      "path": "Schema/word-frequency.schema.json",
+      "description": "Ranked top-word or bottom-word frequency row."
+    },
+    {
+      "path": "Schema/readability-score.schema.json",
+      "description": "Readability score output row."
+    },
+    {
+      "path": "Schema/command-request.schema.json",
+      "description": "Normalized request object for CLI/API command execution."
+    },
+    {
+      "path": "Schema/diff-result.schema.json",
+      "description": "Metric comparison result for two sources."
+    },
+    {
+      "path": "Schema/multi-source-result.schema.json",
+      "description": "Mapping of source names to stats for compare or multi-file stats."
+    },
+    {
+      "path": "Schema/history-record.schema.json",
+      "description": "History record object for previous command invocations."
+    }
+  ]
+}

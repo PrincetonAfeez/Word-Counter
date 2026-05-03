@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/multi-source-result.schema.json",
+  "title": "Multi-source Result",
+  "description": "A mapping of source labels to text statistics for compare or multi-source stats commands.",
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "text-stats.schema.json"
+  }
+}

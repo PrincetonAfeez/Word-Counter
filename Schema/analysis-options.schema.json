@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/analysis-options.schema.json",
+  "title": "Analysis Options",
+  "description": "Tokenizer, normalization, filtering, and output options for text analysis.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tokenizer": {
+      "type": "string",
+      "default": "smart",
+      "examples": [
+        "smart",
+        "regex",
+        "whitespace",
+        "ngram:2"
+      ]
+    },
+    "output_format": {
+      "type": "string",
+      "enum": [
+        "plain",
+        "table",
+        "json",
+        "csv",
+        "markdown"
+      ],
+      "default": "plain"
+    },
+    "language": {
+      "type": "string",
+      "default": "en",
+      "examples": [
+        "en",
+        "es",
+        "fr"
+      ]
+    },
+    "case_sensitive": {
+      "type": "boolean",
+      "default": false
+    },
+    "fold_diacritics": {
+      "type": "boolean",
+      "default": false
+    },
+    "strip_punctuation": {
+      "type": "boolean",
+      "default": false
+    },
+    "strip_numbers": {
+      "type": "boolean",
+      "default": false
+    },
+    "ignore_stopwords": {
+      "type": "boolean",
+      "default": false
+    },
+    "min_length": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_length": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "min_count": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1
+    },
+    "only_alpha": {
+      "type": "boolean",
+      "default": false
+    },
+    "grep": {
+      "type": "string",
+      "description": "Regex pattern used to include matching tokens."
+    },
+    "chunk_size": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 65536
+    },
+    "no_color": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
