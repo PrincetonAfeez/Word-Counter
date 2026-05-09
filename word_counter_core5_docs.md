@@ -1,7 +1,7 @@
 # Architecture Decision Record
 
 ## App 39 — Word Counter
-**Text Analysis Group | Document 1 of 5**
+***Text Analysis Group | Document 1 of 5***
 
 ## Title
 Adopt a streaming-first, strategy-based architecture for a multi-format word counter.
