@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/text-stats.schema.json",
+  "title": "Text Statistics",
+  "description": "Summary statistics returned by a word-count analysis.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "characters",
+    "characters_without_whitespace",
+    "bytes",
+    "words",
+    "unique_words",
+    "lines",
+    "sentences",
+    "paragraphs"
+  ],
+  "properties": {
+    "characters": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "characters_without_whitespace": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "words": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unique_words": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "lines": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sentences": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "paragraphs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "average_word_length": {
+      "type": "number",
+      "minimum": 0
+    },
+    "median_word_length": {
+      "type": "number",
+      "minimum": 0
+    },
+    "mode_word_length": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stdev_word_length": {
+      "type": "number",
+      "minimum": 0
+    },
+    "average_words_per_sentence": {
+      "type": "number",
+      "minimum": 0
+    },
+    "longest_sentence_words": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "shortest_sentence_words": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type_token_ratio": {
+      "type": "number",
+      "minimum": 0
+    },
+    "hapax_legomena": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "hapax_ratio": {
+      "type": "number",
+      "minimum": 0
+    },
+    "word_frequencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "letter_frequencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "punctuation_frequencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  }
+}

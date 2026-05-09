@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/word-frequency.schema.json",
+  "title": "Word Frequency",
+  "description": "A ranked word-frequency result row.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "word",
+    "count",
+    "rank",
+    "percentage"
+  ],
+  "properties": {
+    "word": {
+      "type": "string",
+      "minLength": 1
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rank": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "percentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    }
+  }
+}

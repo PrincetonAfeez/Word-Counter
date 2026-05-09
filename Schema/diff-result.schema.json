@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/diff-result.schema.json",
+  "title": "Diff Result",
+  "description": "Metric-by-metric comparison between two analyzed sources.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": [
+      "delta"
+    ],
+    "properties": {
+      "delta": {
+        "type": "number"
+      }
+    },
+    "additionalProperties": {
+      "type": "number"
+    }
+  },
+  "examples": [
+    {
+      "words": {
+        "draft1.txt": 100,
+        "draft2.txt": 125,
+        "delta": 25
+      }
+    }
+  ]
+}

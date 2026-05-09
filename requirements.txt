@@ -1,0 +1,6 @@
+# Editable install from this directory (matches pyproject.toml).
+-e .
+
+# Optional: pip install -e ".[docx]"  — python-docx
+# Optional: pip install -e ".[pdf]"  — pypdf
+# Optional: pip install -e ".[dev]"  — pytest, hypothesis, mypy, ruff

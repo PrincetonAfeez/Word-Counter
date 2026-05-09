@@ -1,0 +1,167 @@
+Word Counter
+
+Features — chosen for what each one proves
+Core domain (demonstrates: dataclasses, immutability, operator overloading, composition)
+
+TextStats dataclass (@dataclass(frozen=True)) with character count, word count, line count, sentence count, paragraph count, byte count, and a Counter of word frequencies
+Operator overloading on TextStats: __add__ combines stats from two sources (essential for batch mode), __eq__ for test assertions, __format__ with specs compact, full, table
+WordFrequency dataclass — word, count, rank, percentage. Returned by top-N queries.
+ReadabilityScore dataclass — score value, grade level, algorithm name. Union-ish return type for multiple scoring methods.
+TokenType Enum: WORD, NUMBER, PUNCTUATION, WHITESPACE, EMOJI, URL, EMAIL — explicit vocabulary for the tokenizer's output
+Custom exception hierarchy: WordCountError → UnsupportedFormatError, EncodingError, EmptyInputError, TokenizerError
+
+Tokenization (demonstrates: strategy pattern, Protocols, regex, Unicode awareness)
+
+Tokenizer Protocol with tokenize(text: str) -> Iterator[Token] — iterator, not list, because streaming matters
+Four implementations, each with a legitimate trade-off:
+
+WhitespaceTokenizer — naive, fast, str.split(). The baseline.
+RegexTokenizer — Unicode-aware via \w+ with re.UNICODE. Handles accented characters, CJK boundaries reasonably.
+SmartTokenizer — preserves contractions ("don't" is one word), handles hyphenation, recognizes URLs and emails as single tokens
+NgramTokenizer — wraps another tokenizer, emits n-grams of configurable size. Demonstrates composition over inheritance.
+
+
+TokenizerRegistry — selected by --tokenizer flag. Each has visible trade-offs, not a hidden "correct" choice. This is where an architecture student earns their keep.
+
+Text normalization (demonstrates: composable pipelines, separation of concerns)
+
+Normalizer Protocol with normalize(text: str) -> str
+Composable normalizers:
+
+CaseFolder — str.casefold() for true Unicode lowercasing
+DiacriticFolder — unicodedata.normalize('NFKD', s) + combining mark strip
+PunctuationStripper — configurable, preserves sentence boundaries if asked
+NumberStripper — optional, for pure linguistic analysis
+StopwordFilter — loaded from a language-specific list, applied at token level (technically a filter, but fits the pipeline)
+
+
+NormalizationPipeline applies normalizers in order. Configurable via CLI and config file.
+The key insight to articulate in ARCHITECTURE.md: normalization happens before tokenization for some concerns (case), after for others (stopwords). The pipeline handles both stages.
+
+Streaming architecture (demonstrates: generators, memory efficiency, the single most important design decision)
+
+Everything is a generator until it can't be. File read → lines generator → tokens generator → filtered tokens generator → aggregation. A 10GB file should use <50MB of memory.
+StreamingReader Protocol with read_chunks(source) -> Iterator[str]
+Implementations:
+
+FileReader — reads in configurable chunk sizes, handles encoding detection via chardet (optional dep, graceful fallback to utf-8)
+StdinReader — for pipe support (cat file.txt | wordcount -)
+StringReader — for tests, zero I/O
+
+
+Chunk boundary handling — a word split across chunks must not be counted twice or lost. Buffer the tail of each chunk until the next whitespace. This is the classic streaming gotcha and worth calling out in your README.
+This decision is what separates "student toy" from "could actually process a real corpus." Talk about it explicitly.
+
+Format handlers (demonstrates: polymorphism, adapter pattern, graceful degradation)
+
+FormatHandler Protocol with extract_text(source) -> Iterator[str]
+Built-in handlers:
+
+PlainTextHandler — the default
+MarkdownHandler — strips markdown syntax before tokenization (optional: count code blocks separately)
+HtmlHandler — uses html.parser (stdlib), extracts text, ignores script/style. No beautifulsoup dependency — write the parser yourself using the stdlib's HTMLParser class. ~30 lines, massive learning payoff.
+JsonHandler — recursively extracts string values from JSON. Useful for counting words in structured data exports.
+
+
+Optional handlers with graceful degradation (wrap imports in try/except):
+
+DocxHandler via python-docx if installed, otherwise error with install instructions
+PdfHandler via pypdf if installed
+
+
+Format auto-detection by extension, overridable via --format flag
+The stdlib-only handlers are your core; optional handlers show you understand graceful degradation as a design concept
+
+Statistics engine (demonstrates: collections, itertools, statistics stdlib, pure functions)
+
+Core counts: characters (with/without whitespace), words, lines, sentences (using a sentence-boundary regex), paragraphs (blank-line separated), bytes
+Word frequency analysis: full Counter, top-N, bottom-N, words appearing exactly once (hapax legomena — impressive vocabulary for a README)
+Length statistics: average word length, median, mode, standard deviation. All via statistics stdlib.
+Sentence statistics: average words per sentence, longest/shortest sentence
+Vocabulary richness:
+
+Type-token ratio (unique words / total words)
+Hapax ratio (words appearing once / total unique)
+These are real linguistic metrics, cheap to compute, impressive on a README
+
+
+Readability scores — implement two of: Flesch Reading Ease, Flesch-Kincaid Grade, Gunning Fog, Coleman-Liau. Pure functions of character/word/syllable counts. Syllable counting via a heuristic (vowel groups), documented as approximate.
+Character distribution: letter frequency (for cryptography/linguistics fans), punctuation frequency
+Every statistic is a pure function of a TextStats object. The engine builds the stats once; every report reads from the same object. Single pass over input.
+
+Comparison mode (demonstrates: composition, the __add__ payoff)
+
+wordcount diff file1.txt file2.txt — side-by-side stats, highlighting differences
+wordcount compare *.txt — table across many files
+wordcount merge file1.txt file2.txt — combined stats, demonstrating TextStats.__add__
+These features cost almost nothing once the core is right, and they're the proof that your design composes
+
+Output formatting (demonstrates: strategy pattern, separation of data from presentation)
+
+OutputFormatter Protocol with format(stats: TextStats, options) -> str
+Formatters:
+
+PlainFormatter — human-readable, colored terminal output
+TableFormatter — aligned columns, good for multi-file comparison
+JsonFormatter — machine-readable, for piping to jq or other tools
+CsvFormatter — spreadsheet-friendly
+MarkdownFormatter — copy-paste into reports or GitHub issues
+
+
+ASCII bar charts for top-word frequencies — Unicode block characters, proportional widths. ~20 lines, disproportionate visual impact.
+ANSI color module you write yourself (~30 lines). Respects NO_COLOR env var and --no-color flag.
+Single --format flag selects the formatter. Same data, five presentations.
+
+Filtering & querying (demonstrates: functional thinking, filter, predicates)
+
+--min-length N / --max-length N — word length filters
+--min-count N — frequency threshold
+--ignore-case (default on), --case-sensitive
+--ignore-stopwords with built-in English/Spanish/French lists (bundled small files)
+--only-alpha — drop tokens containing digits or symbols
+--grep PATTERN — only count words matching a regex
+All filters are Predicate objects (callables returning bool) composed into a chain. Adding a filter = writing one function. Functional composition done right.
+
+CLI (demonstrates: argparse, subcommands, Unix composability)
+
+wordcount file.txt — zero-friction default, prints standard stats
+wordcount stats file.txt — explicit form with full options
+wordcount top file.txt -n 20 — top N words
+wordcount freq file.txt --word "example" — single-word frequency lookup
+wordcount readability file.txt — readability scores
+wordcount diff a.txt b.txt, wordcount compare *.txt, wordcount merge *.txt
+wordcount - — read stdin. Every command accepts - as "stdin".
+cat *.txt | wordcount stats - works out of the box if you designed the streaming right
+Global flags: --tokenizer, --format, --language, --no-color, --encoding, --chunk-size, --ignore-stopwords
+
+Persistence & config (demonstrates: stdlib fluency, pathlib)
+
+Config at ~/.wordcount/config.toml loaded via tomllib: default tokenizer, default formatter, default language, stopword list paths, active normalizers
+Bundled stopword files in package data (en.txt, es.txt, fr.txt) — small, shippable
+History log at ~/.wordcount/history.jsonl — append-only, one line per invocation, records file path, stats summary, timestamp. Enables wordcount history --last 10.
+pathlib.Path everywhere, directories auto-created on first run
+
+Testing (demonstrates: pytest, fixtures, parametrization, property-based testing)
+
+Fixtures for in-memory string sources — every test runs in milliseconds, zero I/O
+Parametrized tokenizer tests — same inputs, different tokenizers, documented expected outputs. Catches regressions and documents tokenizer differences.
+Chunk-boundary tests — split a known string across every possible boundary, assert counts match non-streaming version. This is the test that catches the single nastiest streaming bug.
+Format handler tests — small fixture files (markdown, HTML, JSON) with known expected extractions
+Statistics tests — hand-computed values for small inputs, asserted exactly
+Property-based tests with hypothesis:
+
+For any text, stats(text).word_count == stats(text + " ").word_count (trailing whitespace invariant)
+For any two texts, stats(a) + stats(b) == stats(a + b) (merge is correct) — this is the big one, it exercises __add__ against the single-pass version
+For any text, top-N contains no word with count below the Nth
+
+
+CLI integration tests using subprocess — every subcommand gets at least one smoke test
+Target >85% coverage on logic branches, not line theater
+
+Tooling & docs (demonstrates: you treat this as real software)
+
+pyproject.toml with console entry point, optional extras ([docx], [pdf]), dev deps, package data for stopwords
+ruff + mypy clean, type hints throughout including Iterator[T] for the streaming APIs
+README.md — install, 8+ usage examples including pipe compositions, format support matrix, performance note (benchmarked on a known large file)
+ARCHITECTURE.md — five sections: (1) streaming-first design, (2) tokenization as strategy, (3) normalization as composable pipeline, (4) statistics as pure functions of a single stats object, (5) TextStats.__add__ as the mergeability proof
+BENCHMARKS.md — run on a known corpus (Project Gutenberg's "War and Peace" is a classic 3MB test), compare against wc -w, document memory usage. Numbers beat adjectives.

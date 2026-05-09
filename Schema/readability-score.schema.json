@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/readability-score.schema.json",
+  "title": "Readability Score",
+  "description": "A readability score produced by a named algorithm.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "score",
+    "grade_level",
+    "algorithm_name"
+  ],
+  "properties": {
+    "score": {
+      "type": "number"
+    },
+    "grade_level": {
+      "type": "string"
+    },
+    "algorithm_name": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

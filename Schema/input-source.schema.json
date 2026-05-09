@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/input-source.schema.json",
+  "title": "Input Source",
+  "description": "A source of text to analyze, such as a file path, stdin, or inline text.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "file",
+        "stdin",
+        "inline_text"
+      ],
+      "description": "Where the text comes from."
+    },
+    "path": {
+      "type": "string",
+      "description": "Path to the source file. Required when type is file."
+    },
+    "text": {
+      "type": "string",
+      "description": "Inline text content. Required when type is inline_text."
+    },
+    "input_format": {
+      "type": "string",
+      "enum": [
+        "txt",
+        "text",
+        "plain",
+        "md",
+        "markdown",
+        "html",
+        "htm",
+        "json",
+        "docx",
+        "pdf"
+      ],
+      "description": "Declared source format. May be omitted when inferred from file extension."
+    },
+    "encoding": {
+      "type": "string",
+      "default": "utf-8",
+      "description": "Text encoding for file-based sources."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "file"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "inline_text"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "text"
+        ]
+      }
+    }
+  ]
+}

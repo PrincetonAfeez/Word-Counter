@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/word-counter/schema/history-record.schema.json",
+  "title": "History Record",
+  "description": "A saved Word Counter invocation history record.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "timestamp",
+    "command",
+    "sources",
+    "summary"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "command": {
+      "type": "string",
+      "enum": [
+        "stats",
+        "top",
+        "freq",
+        "readability",
+        "diff",
+        "compare",
+        "merge",
+        "history"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "summary": {
+      "type": "object"
+    }
+  }
+}
